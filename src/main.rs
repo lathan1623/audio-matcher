@@ -43,12 +43,18 @@ fn main() -> Result<(), anyhow::Error> {
     println!("No longer capturing stream");
 
     let spectogram = build_spectogram(Arc::clone(&audio_data));
-    find_key_points(&spectogram);
+    let freq = find_key_points(&spectogram);
+
+    hash(&freq);
 
     Ok(())
 }
 
-fn find_key_points(data: &Vec<[Complex<f32>; 1024]>) {
+fn hash(points: &Vec<[usize; 6]>) {
+}
+
+fn find_key_points(data: &Vec<[Complex<f32>; 1024]>) -> Vec<[usize; 6]> {
+    let mut freq_data = Vec::new();
     let freq_ranges = [0, 10, 20, 40, 160, 511];
     for time_slice in data {
         let mut cur_freq_index = 0;
@@ -62,26 +68,11 @@ fn find_key_points(data: &Vec<[Complex<f32>; 1024]>) {
             if mag > max_points[cur_freq_index] {
                 max_points[cur_freq_index] = mag;
                 max_freqs[cur_freq_index] = freq
-            }
-            
-
-            
+            } 
         }
-        for freq in max_freqs {
-            println!("{}", freq)
-        }
+        freq_data.push(max_freqs);
     }
-}
-
-fn visualize_spectogram(data: &Vec<[Complex<f32>; 1024]>) {
-    for time_slice in data {
-        println!("$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-        for freq in 0..1023 {
-            let mag = 20.0 * time_slice[freq].abs().max(1e-10).log10();
-            println!("{}", mag);
-        }
-        println!("$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-    }
+    freq_data
 }
 
 fn build_spectogram(data: Arc<Mutex<Vec<f32>>>) -> Vec<[Complex<f32>; 1024]>  {

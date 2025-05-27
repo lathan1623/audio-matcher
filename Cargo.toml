@@ -8,3 +8,7 @@ anyhow = "1.0.98"
 cpal = "0.15.3"
 hound = "3.5.1"
 rustfft = "6.3.0"
+
+[[bin]]
+name = "load_dataset"
+path = "bin/load_dataset.rs"
