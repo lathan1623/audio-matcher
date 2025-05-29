@@ -10,5 +10,9 @@ hound = "3.5.1"
 rustfft = "6.3.0"
 
 [[bin]]
-name = "load_dataset"
-path = "bin/load_dataset.rs"
+name = "client"
+path = "src/client/bin/main.rs"
+
+[[bin]]
+name = "load"
+path = "src/load/bin/main.rs"
