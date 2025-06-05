@@ -8,6 +8,7 @@ anyhow = "1.0.98"
 cpal = "0.15.3"
 hound = "3.5.1"
 rustfft = "6.3.0"
+sled = "0.34.7"
 
 [[bin]]
 name = "client"

@@ -1,11 +1,13 @@
 use std::{fs, sync::{Arc, Mutex}};
-use rust_audio::{build_spectogram, find_key_points, hash};
+use rust_audio::{hash, build_spectogram, find_key_points};
+use std::ffi::OsString;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut data = Vec::new();
-
-    for song in fs::read_dir("./songs/").expect("Unable to find dir") {
-        let path = song?.path();
+    for dir_entry in fs::read_dir("./songs/").expect("Unable to find dir") {
+        let mut data = Vec::new();
+        let song = dir_entry?; 
+        let path = song.path();
+        let name = song.file_name();
 
         if  path.extension().unwrap() != "wav" {
             continue 
@@ -16,16 +18,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             for point in wav.unwrap() {
                 data.push(point);
             }
+            let ld = Arc::new(Mutex::new(data));
+            let spec = build_spectogram(ld);
+            let points = find_key_points(&spec);
+            load_hash_file(&points, &name);
         }
     }
-    
-    let ld = Arc::new(Mutex::new(data));
-
-    let spec = build_spectogram(ld);
-    let points = find_key_points(&spec);
-    hash(&points);
-
     Ok(())
+}
+
+fn load_hash_file(points: &Vec<[usize; 6]>, song_name: &OsString) {
+    let hash_db = sled::open("hash_db").unwrap();
+    for points_slice in points {
+        let hash = hash(*points_slice);
+        let _ = hash_db.insert(hash.to_be_bytes(), song_name.as_encoded_bytes());
+    }
+    let _ = hash_db.flush();
 }
 
 fn read_wav_file(path: &str) -> anyhow::Result<Vec<f32>> {

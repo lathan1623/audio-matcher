@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex};
 
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 
-use rust_audio::{build_spectogram, find_key_points, hash};
+use rust_audio::{build_spectogram, find_key_points, find_hash_matches};
 
 fn main() -> Result<(), anyhow::Error> {
 
@@ -48,7 +48,7 @@ fn main() -> Result<(), anyhow::Error> {
     let spectogram = build_spectogram(Arc::clone(&audio_data));
     let freq = find_key_points(&spectogram);
 
-    hash(&freq);
+    find_hash_matches(&freq);
 
     Ok(())
 }

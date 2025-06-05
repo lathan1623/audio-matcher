@@ -2,8 +2,27 @@ use std::sync::{Arc, Mutex};
 
 use rustfft::num_complex::{Complex, ComplexFloat};
 
-pub fn hash(points: &Vec<[usize; 6]>) {
-    println!("TODO: Implement")
+use std::hash::{Hash, Hasher};
+
+#[derive(Hash, PartialEq, Eq)]
+pub struct Key([usize; 6]);
+
+pub fn find_hash_matches(points: &Vec<[usize; 6]>) {
+    for point_set in points {
+        let key = Key(*point_set);
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        key.hash(&mut hasher);
+        let hash = hasher.finish();
+        println!("Hash: {}", hash);
+    }
+}
+
+pub fn hash(points_slice: [usize; 6]) -> u64 {
+    let key = Key(points_slice);
+    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+    key.hash(&mut hasher);
+    let hash = hasher.finish();
+    return hash
 }
 
 pub fn find_key_points(data: &Vec<[Complex<f32>; 1024]>) -> Vec<[usize; 6]> {
