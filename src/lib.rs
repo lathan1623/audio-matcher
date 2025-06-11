@@ -8,12 +8,14 @@ use std::hash::{Hash, Hasher};
 pub struct Key([usize; 6]);
 
 pub fn find_hash_matches(points: &Vec<[usize; 6]>) {
+    let hash_db = sled::open("hash_db").unwrap();
     for point_set in points {
-        let key = Key(*point_set);
-        let mut hasher = std::collections::hash_map::DefaultHasher::new();
-        key.hash(&mut hasher);
-        let hash = hasher.finish();
-        println!("Hash: {}", hash);
+        let hash = hash(*point_set);
+        let result = hash_db.get(hash.to_be_bytes()).unwrap();
+        if let Some(i) = result {
+            let song_name = String::from_utf8(i.to_vec()).unwrap();
+            println!("song name found {}", song_name);
+        }
     }
 }
 
