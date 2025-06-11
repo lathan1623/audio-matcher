@@ -32,15 +32,16 @@ pub fn find_key_points(data: &Vec<[Complex<f32>; 1024]>) -> Vec<[usize; 6]> {
     let freq_ranges = [0, 10, 20, 40, 160, 511];
     for time_slice in data {
         let mut cur_freq_index = 0;
-        let mut max_points = [f32::NEG_INFINITY; 6];
+        let mut max_points = [i32::MIN; 6];
         let mut max_freqs = [0; 6];
         for freq in 0..511 {
             let mag = 20.0 * time_slice[freq].abs().max(1e-10).log10();
+            let mag_int = (mag * 10.0).round() as i32;
             if freq > freq_ranges[cur_freq_index] {
                 cur_freq_index += 1
             }
-            if mag > max_points[cur_freq_index] {
-                max_points[cur_freq_index] = mag;
+            if mag_int > max_points[cur_freq_index] {
+                max_points[cur_freq_index] = mag_int;
                 max_freqs[cur_freq_index] = freq
             } 
         }
@@ -54,7 +55,8 @@ pub fn build_spectogram(data: Arc<Mutex<Vec<f32>>>) -> Vec<[Complex<f32>; 1024]>
     let mut time_sliced_data: Vec<[Complex<f32>; 1024]> = data
         .lock()
         .unwrap()
-        .chunks_exact(1024)
+        .windows(1024)
+        .step_by(512)
         .map(|chunk| {
             let mut buf = [Complex::new(0.0, 0.0); 1024];
             for (i, &real) in chunk.iter().enumerate() {

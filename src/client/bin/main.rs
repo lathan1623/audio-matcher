@@ -41,7 +41,7 @@ fn main() -> Result<(), anyhow::Error> {
 
     stream.play().unwrap();
 
-    std::thread::sleep(std::time::Duration::from_secs(3));
+    std::thread::sleep(std::time::Duration::from_secs(30));
 
     drop(stream);
 
