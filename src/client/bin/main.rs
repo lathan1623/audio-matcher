@@ -18,7 +18,7 @@ fn main() -> Result<(), anyhow::Error> {
     let config = device.default_input_config()
         .expect("No supported I8 output format");
 
-    println!("Sample rate: {}", config.sample_rate());
+    println!("Sample rate: {}", config.sample_rate().0);
 
     println!("{}", config.sample_format());
 
