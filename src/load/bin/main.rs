@@ -40,6 +40,8 @@ fn read_wav_file(path: &str) -> anyhow::Result<Vec<f32>> {
     let mut reader = hound::WavReader::open(path)?;
     let spec = reader.spec();
 
+    println!("WAV sample rate: {}", spec.sample_rate);
+
     let samples: Vec<f32> = match spec.sample_format {
         hound::SampleFormat::Int => {
             let max_amplitude = 2_i32.pow(spec.bits_per_sample as u32 - 1) as f32;
